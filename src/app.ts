@@ -1,9 +1,15 @@
 import express, {Request, Response} from "express";
-
+import morgan from "morgan"
+import { MORGAN } from "./libs/config";
+import adminRouter from "./routes/admin";
+import userRouter from "./routes/user";
 
 const app = express();
-app.get("/", (req:Request, res:Response)=>{
-    res.send("Hello World")
-})
+app.use(express.urlencoded({extended:true}))
+app.use(morgan(MORGAN))
+app.use("/admin", adminRouter)
+app.use("/", userRouter)
+
+
 
 export default app
