@@ -17,6 +17,9 @@ const memberSchema = new Schema({
         required: true,
         index: { unique: true, sparse: true }
     },
+    memberPassword:{
+        type:String
+    },
     memberPhone: {
         type: String,
         required: true,
