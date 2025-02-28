@@ -2,7 +2,7 @@ import jwt from "jsonwebtoken"
 import { SERCET_TOKEN } from "../libs/config"
 import { T } from "../libs/types/common"
 
-class JwtAuth {
+class AuthService {
     secret_key: string
     constructor() {
         this.secret_key = SERCET_TOKEN
@@ -19,4 +19,4 @@ class JwtAuth {
     }
 }
 
-export default JwtAuth
+export default AuthService

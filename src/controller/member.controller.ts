@@ -6,12 +6,14 @@ import { MemberInput, MemberLogInput } from "../libs/types/member/member.input";
 import { HttpCode } from "../libs/enums/httpCode.enum";
 import { Errors } from "../libs/Error/Error";
 import { Message } from "../libs/enums/message.enum";
-import JwtAuth from "../auth/auth.jwt";
-import { TOKEN_DURATION } from "../libs/config";
+import AuthService from "../auth/auth.jwt";
+import { BUCKET_NAME, BUCKET_REGION, TOKEN_DURATION } from "../libs/config";
+import S3Service from "../aws/s3uploader";
 
 const memberController: T = {}
 const memberService = new MemberService()
-const jwtAuth = new JwtAuth()
+const authService = new AuthService()
+const s3Service = new S3Service()
 
 memberController.signup = async (req: Request, res: Response) => {
     try {
@@ -19,12 +21,14 @@ memberController.signup = async (req: Request, res: Response) => {
         const data: MemberInput = req.body;
         const file = req.file;
         if (file) {
-            data.memberImage = file?.path
+            console.log(BUCKET_REGION)
+            const imageName = await s3Service.uploadImage(file)
+            data.memberImage = imageName as string
             console.log("file:", req.file)
         }
         const member: Member = await memberService.signup(data)
         //@ts-ignore
-        const token = await jwtAuth.createToken(member.toObject())
+        const token = await authService.createToken(member.toObject())
         res.cookie("accessToken", token, {
             maxAge: 60 * 60 * 1000 * TOKEN_DURATION,
             httpOnly: false,
@@ -43,7 +47,10 @@ memberController.login = async (req: Request, res: Response) => {
         console.log("POST: login")
         const data: MemberLogInput = req.body;
         const member: Member = await memberService.login(data);
-        const token = await jwtAuth.createToken(member)
+        if(member.memberImage){
+            member.memberImage = await s3Service.getImageUrl(member.memberImage)
+        }
+        const token = await authService.createToken(member)
         res.cookie("accessToken", token, {
             maxAge: 60 * 60 * 1000 * TOKEN_DURATION,
             httpOnly: false,
