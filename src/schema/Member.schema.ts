@@ -18,7 +18,8 @@ const memberSchema = new Schema({
         index: { unique: true, sparse: true }
     },
     memberPassword:{
-        type:String
+        type:String,
+        select:false
     },
     memberPhone: {
         type: String,
