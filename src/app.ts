@@ -8,6 +8,16 @@ const app = express();
 app.use(express.urlencoded({extended:true}))
 app.use(express.json())
 app.use(morgan(MORGAN))
+
+
+app.use((err:any, req:Request, res:Response, next:any)=>{
+    if(err){
+        res.json(err)
+    }
+})
+
+
+
 app.use("/admin", adminRouter)
 app.use("/", userRouter)
 

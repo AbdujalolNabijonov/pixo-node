@@ -36,7 +36,7 @@ class MemberService {
             if (!isMatch) {
                 throw new Errors(HttpCode.BAD_REQUEST, Message.WRONG_PASSWORD)
             }
-            const member = await this.memberModel.findById(exist._id).exec()
+            const member = await this.memberModel.findById(exist._id).lean().exec()
             return member
         } catch (err: any) {
             throw err
