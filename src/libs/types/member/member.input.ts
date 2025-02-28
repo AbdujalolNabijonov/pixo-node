@@ -5,3 +5,8 @@ export interface MemberInput{
     memberDesc:string
     memberImage:string
 }
+
+export interface MemberLogInput{
+    memberNick:string
+    memberPassword:string
+}

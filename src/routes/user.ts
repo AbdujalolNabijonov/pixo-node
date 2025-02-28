@@ -4,6 +4,7 @@ import uploader from "../libs/utility/imageUploader"
 
 const userRouter = Router()
 
-userRouter.post("/signup",uploader.single("memberImage"), memberController.signup)
+userRouter.post("/signup",uploader.single("memberImage"), memberController.signup);
+userRouter.post("/login", memberController.login)
 
 export default userRouter
