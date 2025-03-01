@@ -17,6 +17,11 @@ class AuthService {
             throw err
         }
     }
+
+    public async retrieveToken(token:string){
+        const member = await jwt.verify(token, SERCET_TOKEN);
+        return member
+    }
 }
 
 export default AuthService

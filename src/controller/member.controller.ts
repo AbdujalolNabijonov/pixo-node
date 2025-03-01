@@ -6,9 +6,9 @@ import { MemberInput, MemberLogInput } from "../libs/types/member/member.input";
 import { HttpCode } from "../libs/enums/httpCode.enum";
 import { Errors } from "../libs/Error/Error";
 import { Message } from "../libs/enums/message.enum";
-import AuthService from "../auth/auth.jwt";
-import { BUCKET_NAME, BUCKET_REGION, TOKEN_DURATION } from "../libs/config";
-import S3Service from "../aws/s3uploader";
+import AuthService from "../model/Auth.service";
+import { BUCKET_REGION, TOKEN_DURATION } from "../libs/config";
+import S3Service from "../model/S3.service";
 
 const memberController: T = {}
 const memberService = new MemberService()
