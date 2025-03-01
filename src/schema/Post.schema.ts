@@ -12,6 +12,9 @@ const postSchema = new Schema({
     postContent: {
         type: String
     },
+    postImages: {
+        type: [String]
+    },
     postStatus: {
         type: String,
         enum: PostStatus,

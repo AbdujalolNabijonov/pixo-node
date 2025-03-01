@@ -1,4 +1,4 @@
-import { Model } from "mongoose"
+import { Model, ObjectId } from "mongoose"
 import MemberModel from "../schema/Member.schema"
 import { MemberInput, MemberLogInput } from "../libs/types/member/member.input"
 import argon2 from 'argon2'
@@ -37,6 +37,19 @@ class MemberService {
                 throw new Errors(HttpCode.BAD_REQUEST, Message.WRONG_PASSWORD)
             }
             const member = await this.memberModel.findById(exist._id).lean().exec()
+            return member
+        } catch (err: any) {
+            throw err
+        }
+    }
+
+    public async statsMemberEdit(memberId: ObjectId, modifier: number) {
+        try {
+            const member = await this.memberModel.findOneAndUpdate(
+                { _id: memberId, memberStatus: MemberStatus.ACTIVE },
+                { $inc: { memberPosts: modifier } }
+            ).lean().exec()
+            if (!member) throw new Errors(HttpCode.NOT_FOUND, Message.NOT_FOUND)
             return member
         } catch (err: any) {
             throw err
