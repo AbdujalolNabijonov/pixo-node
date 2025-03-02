@@ -6,6 +6,7 @@ import { Request, Response } from "express"
 import { PostInput, PostInquiry } from "../libs/types/post/post.input";
 import PostService from "../model/Post.service";
 import S3Service from "../model/S3.service";
+import { Member } from "../libs/types/member/member";
 
 const postController: T = {};
 const postService = new PostService()
@@ -46,6 +47,19 @@ postController.getPosts = async (req: RequestAuth, res: Response) => {
         console.log(`Error: getPosts, ${err.message}`)
         const message = new Errors(HttpCode.BAD_REQUEST, err.message)
         res.status(HttpCode.BAD_REQUEST).json({ err: message })
+    }
+}
+
+postController.deletePost = async (req: RequestAuth, res: Response) => {
+    try {
+        console.log("POST: deletePost")
+        const postId = req.params.id as string;
+        const post = await postService.deletePost(req.member as Member, postId);
+        res.status(HttpCode.OK).json({ value: post })
+    } catch (err: any) {
+        console.log(`Error: deletePost, ${err.message}`)
+        const message = new Errors(HttpCode.NOT_FOUND, err.message)
+        res.status(HttpCode.NOT_FOUND).json({ err: message })
     }
 }
 

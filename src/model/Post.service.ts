@@ -67,6 +67,26 @@ class PostService {
             throw err
         }
     }
+
+    public async deletePost(member: Member, postId: string): Promise<Post> {
+        try {
+            const exist = await this.postModel.findOneAndDelete(
+                {
+                    _id: shapeintomongodbkey(postId),
+                    postStatus: PostStatus.Active,
+                    memberId: shapeintomongodbkey(member._id)
+                }
+            ).exec();
+            await Promise.all(
+                exist.postImages.map(async (key: string) => {
+                    await this.s3Service.deleteImage(key)
+                })
+            )
+            return exist
+        } catch (err: any) {
+            throw err
+        }
+    }
 }
 
 export default PostService

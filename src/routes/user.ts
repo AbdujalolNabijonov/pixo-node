@@ -53,4 +53,11 @@ userRouter.get(
     postController.getPosts
 )
 
+userRouter.post(
+    "/post/delete/:id",
+    memberRetrieve,
+    postController.deletePost
+)
+
+
 export default userRouter
