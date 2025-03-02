@@ -1,7 +1,7 @@
 import { HttpCode } from "../enums/httpCode.enum";
 import { Message } from "../enums/message.enum";
 
-export class Errors extends Error{
+export class Errors extends Error {
     public code: HttpCode;
     public message: Message;
 

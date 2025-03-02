@@ -7,7 +7,7 @@ import { T } from '../types/common';
 import { Member } from '../types/member/member';
 
 
-async function memberRetrieve(req:T, res: Response, next: NextFunction) {
+export async function memberRetrieve(req: T, res: Response, next: NextFunction) {
     try {
         const token = req.cookies?.accessToken;
         if (!token) {
@@ -24,4 +24,16 @@ async function memberRetrieve(req:T, res: Response, next: NextFunction) {
     }
 }
 
-export default memberRetrieve
+export async function isMemberAuth(req: T, res: Response, next: NextFunction) {
+    const token = req.cookies.accessToken;
+    if (!token) {
+        req.member = null;
+        next()
+    } else {
+        const authService = new AuthService()
+        const member = await authService.retrieveToken(token)
+        req.member = member as Member;
+        next()
+    }
+
+}

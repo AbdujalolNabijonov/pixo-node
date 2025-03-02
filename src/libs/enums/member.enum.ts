@@ -3,7 +3,7 @@ export enum MemberType {
     ADMIN = "ADMINS"
 }
 
-export enum MemberStatus{
-    ACTIVE="ACTIVE",
-    BLOCK="BLOCK"
+export enum MemberStatus {
+    ACTIVE = "ACTIVE",
+    BLOCK = "BLOCK"
 }

@@ -1,5 +1,5 @@
 import { S3Client, PutObjectCommand, GetObjectCommand } from "@aws-sdk/client-s3"
-import { BUCKET_NAME, BUCKET_REGION, S3_ACCESS_KEY, S3_SECRET_KEY } from "../libs/config"
+import { BUCKET_NAME, BUCKET_REGION, S3_ACCESS_KEY, S3_SECRET_KEY, URL_DURATION } from "../libs/config"
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { v4 } from "uuid"
 import path from 'path'
@@ -37,7 +37,7 @@ class S3Service {
             Key: key
         }
         const command = new GetObjectCommand(getCommand)
-        return await getSignedUrl(s3, command, { expiresIn: 10 })
+        return await getSignedUrl(s3, command, { expiresIn: 3600 * URL_DURATION })
     }
 
     private formatImageName(imageName: string) {

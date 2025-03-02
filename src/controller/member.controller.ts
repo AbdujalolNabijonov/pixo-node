@@ -47,7 +47,7 @@ memberController.login = async (req: Request, res: Response) => {
         console.log("POST: login")
         const data: MemberLogInput = req.body;
         const member: Member = await memberService.login(data);
-        if(member.memberImage){
+        if (member.memberImage) {
             member.memberImage = await s3Service.getImageUrl(member.memberImage)
         }
         const token = await authService.createToken(member)
