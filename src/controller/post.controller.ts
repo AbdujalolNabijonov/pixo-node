@@ -13,6 +13,7 @@ const s3Service = new S3Service()
 
 postController.createPost = async (req: RequestAuth, res: Response) => {
     try {
+        console.log("POST: createPost")
         const data: PostInput = req.body;
         const files = req.files as [];
         if (!req.member) {
@@ -31,19 +32,20 @@ postController.createPost = async (req: RequestAuth, res: Response) => {
     } catch (err: any) {
         console.log(`Error: createPost, ${err.message}`)
         const message = new Errors(HttpCode.BAD_REQUEST, err.message)
-        res.status(HttpCode.BAD_REQUEST).json({ status: HttpCode.BAD_REQUEST, message })
+        res.status(HttpCode.BAD_REQUEST).json({ err: message })
     }
 }
 
 postController.getPosts = async (req: RequestAuth, res: Response) => {
     try {
+        console.log("GET: getPosts")
         const data: PostInquiry = req.body;
         const result = await postService.getPosts(req.member, data)
         res.status(HttpCode.OK).json({ value: result })
     } catch (err: any) {
         console.log(`Error: getPosts, ${err.message}`)
         const message = new Errors(HttpCode.BAD_REQUEST, err.message)
-        res.status(HttpCode.BAD_REQUEST).json({ status: HttpCode.BAD_REQUEST, message })
+        res.status(HttpCode.BAD_REQUEST).json({ err: message })
     }
 }
 

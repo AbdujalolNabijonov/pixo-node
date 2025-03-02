@@ -7,14 +7,37 @@ import { isMemberAuth, memberRetrieve } from "../libs/middleware/auth.md";
 const userRouter = Router()
 
 //MEMBER API
-userRouter.post("/member/signup", uploader.single("memberImage"), memberController.signup);
-userRouter.post("/member/login", memberController.login)
+userRouter.post(
+    "/member/signup",
+    uploader.single("memberImage"),
+    memberController.signup
+);
+userRouter.post(
+    "/member/login",
+    memberController.login
+)
+userRouter.get(
+    "/member/:id",
+    isMemberAuth,
+    memberController.getMember
+)
+// userRouter.post(
+//     "/member/edit",
+//     memberRetrieve,
+//     uploader.single("memberImage"),
+//     memberController.updateMember
+// )
+// userRouter.get(
+//     "/member/members",
+//     isMemberAuth,
+//     memberController.getMembers
+// )
 
 //POST API
 userRouter.post(
     "/post/createpost",
     memberRetrieve,
-    uploader.array("postImages"),
+    uploader.array("postImages", 5),
     postController.createPost
 )
 userRouter.get(

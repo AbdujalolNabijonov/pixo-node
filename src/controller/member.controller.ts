@@ -1,4 +1,4 @@
-import { T } from "../libs/types/common";
+import { RequestAuth, T } from "../libs/types/common";
 import { Request, Response } from "express"
 import { Member } from "../libs/types/member/member";
 import MemberService from "../model/Member.service";
@@ -9,6 +9,7 @@ import { Message } from "../libs/enums/message.enum";
 import AuthService from "../model/Auth.service";
 import { BUCKET_REGION, TOKEN_DURATION } from "../libs/config";
 import S3Service from "../model/S3.service";
+import { UpdateMember } from "../libs/types/member/member.update";
 
 const memberController: T = {}
 const memberService = new MemberService()
@@ -34,11 +35,11 @@ memberController.signup = async (req: Request, res: Response) => {
             httpOnly: false,
             secure: process.env.NODE_ENV === "production"
         })
-        res.status(HttpCode.CREATED).json({ member })
+        res.status(HttpCode.CREATED).json({ value: member })
     } catch (err: any) {
         console.log(`Error: signup, ${err.message}`)
         const message = new Errors(HttpCode.BAD_REQUEST, Message.CREATE_FAILED)
-        res.status(HttpCode.BAD_REQUEST).json({ status: HttpCode.BAD_REQUEST, message })
+        res.status(HttpCode.BAD_REQUEST).json({ err: message })
     }
 }
 
@@ -56,11 +57,24 @@ memberController.login = async (req: Request, res: Response) => {
             httpOnly: false,
             secure: process.env.NODE_ENV === "production"
         })
-        res.status(HttpCode.FOUND).json({ member })
+        res.status(HttpCode.FOUND).json({ value: member })
     } catch (err: any) {
         console.log(`Error: login, ${err.message}`)
         const message = new Errors(HttpCode.INTERNAL_SERVER_ERROR, err.message)
-        res.status(HttpCode.INTERNAL_SERVER_ERROR).json({ status: HttpCode.BAD_REQUEST, message })
+        res.status(HttpCode.INTERNAL_SERVER_ERROR).json({ err: message })
+    }
+}
+
+memberController.getMember = async (req: RequestAuth, res: Response) => {
+    try {
+        console.log("GET: getMember")
+        const memberId = req.params.id as string;
+        const member = await memberService.getMember(req.member, memberId);
+        res.status(HttpCode.OK).json({ value: member })
+    } catch (err: any) {
+        console.log(`Error: getMember, ${err.message}`)
+        const message = new Errors(HttpCode.NOT_FOUND, err.message)
+        res.status(HttpCode.NOT_FOUND).json({ err: message })
     }
 }
 

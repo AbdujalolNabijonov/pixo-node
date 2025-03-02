@@ -17,9 +17,10 @@ const memberSchema = new Schema({
         required: true,
         index: { unique: true, sparse: true }
     },
-    memberPassword:{
-        type:String,
-        select:false
+    memberPassword: {
+        type: String,
+        select: false,
+        required: true
     },
     memberPhone: {
         type: String,
@@ -40,7 +41,7 @@ const memberSchema = new Schema({
         type: Number,
         default: 0
     }
-}, { timestamps: true})
+}, { timestamps: true })
 
-const MemberModel = model("Member",memberSchema)
+const MemberModel = model("Member", memberSchema)
 export default MemberModel
