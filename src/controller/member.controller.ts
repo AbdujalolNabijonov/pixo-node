@@ -9,25 +9,18 @@ import { Message } from "../libs/enums/message.enum";
 import AuthService from "../model/Auth.service";
 import { BUCKET_REGION, TOKEN_DURATION } from "../libs/config";
 import S3Service from "../model/S3.service";
-import { UpdateMember } from "../libs/types/member/member.update";
+import { MemberUpdate } from "../libs/types/member/member.update";
 
 const memberController: T = {}
 const memberService = new MemberService()
 const authService = new AuthService()
-const s3Service = new S3Service()
 
 memberController.signup = async (req: Request, res: Response) => {
     try {
         console.log("POST: signup")
         const data: MemberInput = req.body;
         const file = req.file;
-        if (file) {
-            console.log(BUCKET_REGION)
-            const imageName = await s3Service.uploadImage(file)
-            data.memberImage = imageName as string
-            console.log("file:", req.file)
-        }
-        const member: Member = await memberService.signup(data)
+        const member: Member = await memberService.signup(file, data)
         //@ts-ignore
         const token = await authService.createToken(member.toObject())
         res.cookie("accessToken", token, {
@@ -48,9 +41,6 @@ memberController.login = async (req: Request, res: Response) => {
         console.log("POST: login")
         const data: MemberLogInput = req.body;
         const member: Member = await memberService.login(data);
-        if (member.memberImage) {
-            member.memberImage = await s3Service.getImageUrl(member.memberImage)
-        }
         const token = await authService.createToken(member)
         res.cookie("accessToken", token, {
             maxAge: 60 * 60 * 1000 * TOKEN_DURATION,
@@ -75,6 +65,25 @@ memberController.getMember = async (req: RequestAuth, res: Response) => {
         console.log(`Error: getMember, ${err.message}`)
         const message = new Errors(HttpCode.NOT_FOUND, err.message)
         res.status(HttpCode.NOT_FOUND).json({ err: message })
+    }
+}
+
+memberController.updateMember = async (req: RequestAuth, res: Response) => {
+    try {
+        console.log("POST: updateMember")
+        const data: MemberUpdate = req.body;
+        const member = await memberService.updateMember(req.file, req.member as Member, data)
+        const token = await authService.createToken(member)
+        res.cookie("accessToken", token, {
+            maxAge: 60 * 60 * 1000 * TOKEN_DURATION,
+            httpOnly: false,
+            secure: process.env.NODE_ENV === "production"
+        })
+        res.status(HttpCode.OK).json({ value: member })
+    } catch (err: any) {
+        console.log(`Error: updateMember, ${err.message}`)
+        const message = new Errors(HttpCode.NOT_MODIFIED, err.message)
+        res.status(HttpCode.NOT_MODIFIED).json({ err: message })
     }
 }
 

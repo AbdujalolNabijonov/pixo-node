@@ -1,6 +1,6 @@
 import { MemberStatus, MemberType } from "../../enums/member.enum"
 
-export interface UpdateMember{
+export interface MemberUpdate{
         memberType?: MemberType
         memberStatus?: MemberStatus
         memberNick?: string

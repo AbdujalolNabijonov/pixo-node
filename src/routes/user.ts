@@ -12,21 +12,25 @@ userRouter.post(
     uploader.single("memberImage"),
     memberController.signup
 );
+
 userRouter.post(
     "/member/login",
     memberController.login
 )
+
 userRouter.get(
     "/member/:id",
     isMemberAuth,
     memberController.getMember
 )
-// userRouter.post(
-//     "/member/edit",
-//     memberRetrieve,
-//     uploader.single("memberImage"),
-//     memberController.updateMember
-// )
+
+userRouter.post(
+    "/member/edit",
+    memberRetrieve,
+    uploader.single("memberImage"),
+    memberController.updateMember
+)
+
 // userRouter.get(
 //     "/member/members",
 //     isMemberAuth,
@@ -40,6 +44,7 @@ userRouter.post(
     uploader.array("postImages", 5),
     postController.createPost
 )
+
 userRouter.get(
     "/post/posts",
     isMemberAuth,
