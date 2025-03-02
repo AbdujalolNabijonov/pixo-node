@@ -2,11 +2,11 @@ import { Model, ObjectId } from "mongoose"
 import MemberModel from "../schema/Member.schema"
 import { MemberInput, MemberLogInput } from "../libs/types/member/member.input"
 import argon2 from 'argon2'
-import { Member } from "../libs/types/member/member"
+import { Member, Members } from "../libs/types/member/member"
 import { Errors } from "../libs/Error/Error"
 import { HttpCode } from "../libs/enums/httpCode.enum"
 import { Message } from "../libs/enums/message.enum"
-import { MemberStatus } from "../libs/enums/member.enum"
+import { MemberStatus, MemberType } from "../libs/enums/member.enum"
 import { T } from "../libs/types/common"
 import { shapeintomongodbkey } from "../libs/config"
 import S3Service from "./S3.service"
@@ -65,6 +65,9 @@ class MemberService {
                 //like
             ]).exec();
             if (!exist) throw new Errors(HttpCode.NOT_FOUND, Message.NO_USER);
+            if (exist[0].memberImage) {
+                exist[0].memberImage = await this.s3Service.getImageUrl(exist[0].memberImage)
+            }
             return exist[0]
         } catch (err: any) {
             throw err
@@ -89,6 +92,33 @@ class MemberService {
         } catch (err: any) {
             throw err
         }
+    }
+
+    public async getMembers(member: Member | null): Promise<Members> {
+        const match: T = { memberStatus: MemberStatus.ACTIVE, memberType: MemberType.USER }
+        const members = await this.memberModel.aggregate([
+            { $match: match },
+            { $project: { memberPassword: 0 } },
+            {
+                $facet: {
+                    list: [
+                        { $sort: { createdAt: -1 } },
+                        //like
+                    ],
+                    metaCounter: [{ $count: "total" }]
+                }
+            }
+        ]).exec();
+
+        if (!members[0]) throw new Errors(HttpCode.NOT_FOUND, Message.NO_DATA);
+        await Promise.all(
+            members[0].list.map(async (member: Member) => {
+                if (member.memberImage) {
+                    member.memberImage = await this.s3Service.getImageUrl(member.memberImage)
+                }
+            })
+        )
+        return members[0]
     }
 
     public async statsMemberEdit(memberId: ObjectId, modifier: number) {

@@ -1,5 +1,6 @@
 import { ObjectId } from "mongoose"
 import { MemberStatus, MemberType } from "../../enums/member.enum"
+import { MetaCounter } from "../common"
 
 export interface Member {
     _id: ObjectId
@@ -13,4 +14,9 @@ export interface Member {
     memberWarnings: number
     createdAt: Date
     updatedAt: Date
+}
+
+export interface Members {
+    list: Member[]
+    metaCounter: MetaCounter[]
 }

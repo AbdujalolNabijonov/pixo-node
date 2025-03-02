@@ -19,9 +19,9 @@ userRouter.post(
 )
 
 userRouter.get(
-    "/member/:id",
+    "/member/members",
     isMemberAuth,
-    memberController.getMember
+    memberController.getMembers
 )
 
 userRouter.post(
@@ -31,11 +31,13 @@ userRouter.post(
     memberController.updateMember
 )
 
-// userRouter.get(
-//     "/member/members",
-//     isMemberAuth,
-//     memberController.getMembers
-// )
+userRouter.get(
+    "/member/:id",
+    isMemberAuth,
+    memberController.getMember
+)
+
+
 
 //POST API
 userRouter.post(

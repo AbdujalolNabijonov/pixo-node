@@ -56,7 +56,7 @@ class PostService {
             if (result && result.length > 0) {
                 await Promise.all(
                     result[0].list.map(async (post: Post) => {
-                        post.postUrls = await Promise.all(
+                        post.postImages = await Promise.all(
                             post.postImages.map(async (key: string) => await this.s3Service.getImageUrl(key))
                         )
                     })

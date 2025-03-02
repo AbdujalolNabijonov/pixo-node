@@ -87,4 +87,16 @@ memberController.updateMember = async (req: RequestAuth, res: Response) => {
     }
 }
 
+memberController.getMembers = async (req: RequestAuth, res: Response) => {
+    try {
+        console.log("GET: getMembers")
+        const result = await memberService.getMembers(req.member)
+        res.status(HttpCode.OK).json({ value: result })
+    } catch (err: any) {
+        console.log(`Error: getMembers, ${err.message}`)
+        const message = new Errors(HttpCode.BAD_REQUEST, err.message)
+        res.status(HttpCode.BAD_REQUEST).json({ err: message })
+    }
+}
+
 export default memberController
