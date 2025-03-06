@@ -31,7 +31,7 @@ class MemberService {
             delete member.memberPassword
             return member
         } catch (err: any) {
-            throw err
+            throw new Errors(HttpCode.BAD_REQUEST, Message.ALREADY_EXIST)
         }
     }
 

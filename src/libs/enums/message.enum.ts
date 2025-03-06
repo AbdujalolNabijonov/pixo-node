@@ -6,5 +6,6 @@ export enum Message {
     NO_DATA = "There is no data",
     WRONG_PASSWORD = "You inserted wrong password!",
     IMAGES_NOT_PROVIDED = "Images were not provided!",
-    NOT_AUTHENTICATED = "Log in first!"
+    NOT_AUTHENTICATED = "Log in first!",
+    ALREADY_EXIST = "That member already existed!"
 }

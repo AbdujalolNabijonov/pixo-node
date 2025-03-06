@@ -32,8 +32,7 @@ postController.createPost = async (req: RequestAuth, res: Response) => {
         res.status(HttpCode.CREATED).json({ value: post })
     } catch (err: any) {
         console.log(`Error: createPost, ${err.message}`)
-        const message = new Errors(HttpCode.BAD_REQUEST, err.message)
-        res.status(HttpCode.BAD_REQUEST).json({ err: message })
+        res.status(HttpCode.BAD_REQUEST).json({ code: HttpCode.BAD_REQUEST, message: err.messsage })
     }
 }
 
@@ -45,8 +44,7 @@ postController.getPosts = async (req: RequestAuth, res: Response) => {
         res.status(HttpCode.OK).json({ value: result })
     } catch (err: any) {
         console.log(`Error: getPosts, ${err.message}`)
-        const message = new Errors(HttpCode.BAD_REQUEST, err.message)
-        res.status(HttpCode.BAD_REQUEST).json({ err: message })
+        res.status(HttpCode.BAD_REQUEST).json({ code: HttpCode.BAD_REQUEST, message: err.messsage })
     }
 }
 
@@ -58,8 +56,7 @@ postController.deletePost = async (req: RequestAuth, res: Response) => {
         res.status(HttpCode.OK).json({ value: post })
     } catch (err: any) {
         console.log(`Error: deletePost, ${err.message}`)
-        const message = new Errors(HttpCode.NOT_FOUND, err.message)
-        res.status(HttpCode.NOT_FOUND).json({ err: message })
+        res.status(HttpCode.NOT_FOUND).json({ code: HttpCode.BAD_REQUEST, message: err.messsage })
     }
 }
 

@@ -31,8 +31,7 @@ memberController.signup = async (req: Request, res: Response) => {
         res.status(HttpCode.CREATED).json({ value: member })
     } catch (err: any) {
         console.log(`Error: signup, ${err.message}`)
-        const message = new Errors(HttpCode.BAD_REQUEST, Message.CREATE_FAILED)
-        res.status(HttpCode.BAD_REQUEST).json({ err: message })
+        res.status(HttpCode.BAD_REQUEST).json({ code: HttpCode.BAD_REQUEST, message: err.message })
     }
 }
 
@@ -47,11 +46,10 @@ memberController.login = async (req: Request, res: Response) => {
             httpOnly: false,
             secure: process.env.NODE_ENV === "production"
         })
-        res.status(HttpCode.FOUND).json({ value: member })
+        res.status(HttpCode.OK).json({ value: member })
     } catch (err: any) {
         console.log(`Error: login, ${err.message}`)
-        const message = new Errors(HttpCode.INTERNAL_SERVER_ERROR, err.message)
-        res.status(HttpCode.INTERNAL_SERVER_ERROR).json({ err: message })
+        res.status(HttpCode.BAD_REQUEST).json({ code: HttpCode.BAD_REQUEST, message: err.message })
     }
 }
 
@@ -64,7 +62,7 @@ memberController.getMember = async (req: RequestAuth, res: Response) => {
     } catch (err: any) {
         console.log(`Error: getMember, ${err.message}`)
         const message = new Errors(HttpCode.NOT_FOUND, err.message)
-        res.status(HttpCode.NOT_FOUND).json({ err: message })
+        res.status(HttpCode.NOT_FOUND).json({ code: message.code, message: message.message })
     }
 }
 
@@ -83,7 +81,7 @@ memberController.updateMember = async (req: RequestAuth, res: Response) => {
     } catch (err: any) {
         console.log(`Error: updateMember, ${err.message}`)
         const message = new Errors(HttpCode.NOT_MODIFIED, err.message)
-        res.status(HttpCode.NOT_MODIFIED).json({ err: message })
+        res.status(HttpCode.NOT_MODIFIED).json({ code: message.code, message: message.message })
     }
 }
 
@@ -95,7 +93,7 @@ memberController.getMembers = async (req: RequestAuth, res: Response) => {
     } catch (err: any) {
         console.log(`Error: getMembers, ${err.message}`)
         const message = new Errors(HttpCode.BAD_REQUEST, err.message)
-        res.status(HttpCode.BAD_REQUEST).json({ err: message })
+        res.status(HttpCode.BAD_REQUEST).json({ code: message.code, message: message.message })
     }
 }
 

@@ -11,7 +11,7 @@ export class Errors extends Error {
     };
 
     constructor(statusCode: HttpCode, statusMessage: Message) {
-        super();
+        super(statusMessage);
         this.code = statusCode;
         this.message = statusMessage
     }

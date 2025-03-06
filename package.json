@@ -26,10 +26,12 @@
   "dependencies": {
     "@aws-sdk/client-s3": "^3.758.0",
     "@aws-sdk/s3-request-presigner": "^3.758.0",
+    "@types/cors": "^2.8.17",
     "argon2": "^0.41.1",
     "cookie-parser": "^1.4.7",
+    "cors": "^2.8.5",
     "dotenv": "^16.4.7",
-    "express": "^4.21.2",
+    "express": "^4.21.1",
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^6.2.9",
     "morgan": "^1.10.0",
