@@ -37,6 +37,7 @@ class PostService {
             const { text, postStatus, memberId } = search;
 
             const match: T = { postStatus: PostStatus.Active }
+            if (text) match.postTitle = { $regex: new RegExp(text, "i") }
             if (memberId) { match.memberId = shapeintomongodbkey(memberId) }
             const sort: T = { [order ?? "createdAt"]: direction ?? Direction.DEC }
             const result = await this.postModel.aggregate([
@@ -47,6 +48,15 @@ class PostService {
                         list: [
                             { $skip: (page - 1) * limit },
                             { $limit: limit },
+                            {
+                                $lookup: {
+                                    from: "members",
+                                    localField: "memberId",
+                                    foreignField: "_id",
+                                    as: "memberData"
+                                }
+                            },
+                            { $unwind: '$memberData' }
                             //like
                         ],
                         metaCounter: [{ $count: "total" }]
@@ -59,6 +69,9 @@ class PostService {
                         post.postImages = await Promise.all(
                             post.postImages.map(async (key: string) => await this.s3Service.getImageUrl(key))
                         )
+                        if (post.memberData?.memberImage) {
+                            post.memberData.memberImage = await this.s3Service.getImageUrl(post.memberData?.memberImage)
+                        }
                     })
                 )
             }

@@ -17,12 +17,11 @@ class S3Service {
     constructor() { }
 
     async uploadImage(file: any) {
-        const bufferFile = await sharp(file.buffer).resize({ height: 1920, width: 1080, fit: "contain" }).toBuffer()
         const randomName = this.formatImageName(file.originalname)
         const param = {
             Bucket: BUCKET_NAME,
             Key: randomName,
-            Body: bufferFile,
+            Body: file.buffer,
             ContentType: file.mimetype
         }
 

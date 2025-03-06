@@ -47,7 +47,7 @@ userRouter.post(
     postController.createPost
 )
 
-userRouter.get(
+userRouter.post(
     "/post/posts",
     isMemberAuth,
     postController.getPosts
