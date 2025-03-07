@@ -9,6 +9,9 @@ import { PostStatus } from "../libs/enums/post.enum";
 import { Direction } from "../libs/enums/common.enum";
 import { shapeintomongodbkey } from "../libs/config";
 import S3Service from "./S3.service";
+import { Errors } from "../libs/Error/Error";
+import { HttpCode } from "../libs/enums/httpCode.enum";
+import { Message } from "../libs/enums/message.enum";
 
 class PostService {
     postModel: Model<any>;
@@ -90,6 +93,7 @@ class PostService {
                     memberId: shapeintomongodbkey(member._id)
                 }
             ).exec();
+            if (!exist) throw new Errors(HttpCode.NOT_FOUND, Message.NO_POST)
             await Promise.all(
                 exist.postImages.map(async (key: string) => {
                     await this.s3Service.deleteImage(key)

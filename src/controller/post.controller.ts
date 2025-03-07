@@ -56,7 +56,7 @@ postController.deletePost = async (req: RequestAuth, res: Response) => {
         res.status(HttpCode.OK).json({ value: post })
     } catch (err: any) {
         console.log(`Error: deletePost, ${err.message}`)
-        res.status(HttpCode.NOT_FOUND).json({ code: HttpCode.BAD_REQUEST, message: err.messsage })
+        res.status(HttpCode.NOT_FOUND).json({ code: HttpCode.BAD_REQUEST, message: err.message })
     }
 }
 

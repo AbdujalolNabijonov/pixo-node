@@ -19,6 +19,12 @@ userRouter.post(
 )
 
 userRouter.get(
+    "/member/logout",
+    memberRetrieve,
+    memberController.logout
+)
+
+userRouter.get(
     "/member/members",
     isMemberAuth,
     memberController.getMembers

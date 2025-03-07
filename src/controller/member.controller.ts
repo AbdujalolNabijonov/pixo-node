@@ -35,6 +35,20 @@ memberController.signup = async (req: Request, res: Response) => {
     }
 }
 
+memberController.logout = (req: Request, res: Response) => {
+    try {
+        console.log("POST: logout")
+        res.cookie("accessToken", null, {
+            maxAge: 0,
+            httpOnly: false,
+            secure: process.env.NODE_ENV === "production"
+        })
+        res.status(HttpCode.CREATED).json({ value: "done" })
+    } catch (err: any) {
+        res.status(HttpCode.BAD_REQUEST).json({ code: HttpCode.BAD_REQUEST, message: err.message })
+    }
+}
+
 memberController.login = async (req: Request, res: Response) => {
     try {
         console.log("POST: login")

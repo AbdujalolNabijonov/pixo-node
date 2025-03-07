@@ -19,8 +19,7 @@ export async function memberRetrieve(req: T, res: Response, next: NextFunction) 
         next()
     } catch (err: any) {
         console.log(`Error: memberRetrieve, ${err.message}`)
-        const message = new Errors(HttpCode.BAD_REQUEST, err.message)
-        res.status(HttpCode.BAD_REQUEST).json({ status: HttpCode.BAD_REQUEST, message })
+        res.status(HttpCode.BAD_REQUEST).json({ status: HttpCode.BAD_REQUEST, message: err.message })
     }
 }
 
