@@ -22,3 +22,12 @@ export function shapeintomongodbkey(key: ObjectId | string) {
     else return new mongoose.Types.ObjectId(key)
 }
 
+export const memberLookup = () => ({
+    $lookup: {
+        from: "members",
+        localField: "memberId",
+        foreignField: "_id",
+        as: "memberData"
+    }
+})
+

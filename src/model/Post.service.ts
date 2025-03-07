@@ -7,7 +7,7 @@ import MemberService from "./Member.service";
 import { T } from "../libs/types/common";
 import { PostStatus } from "../libs/enums/post.enum";
 import { Direction } from "../libs/enums/common.enum";
-import { shapeintomongodbkey } from "../libs/config";
+import { memberLookup, shapeintomongodbkey } from "../libs/config";
 import S3Service from "./S3.service";
 import { Errors } from "../libs/Error/Error";
 import { HttpCode } from "../libs/enums/httpCode.enum";
@@ -77,6 +77,26 @@ class PostService {
                         }
                     })
                 )
+            }
+            return result[0]
+        } catch (err: any) {
+            throw err
+        }
+    }
+
+    public async getPost(member: Member | null, postId: string): Promise<Post> {
+        try {
+            const exist = await this.postModel.findOne({ _id: shapeintomongodbkey(postId), postStatus: PostStatus.Active }).exec()
+            if (!exist) throw new Errors(HttpCode.NOT_FOUND, Message.NO_POST);
+            const result = await this.postModel.aggregate([
+                { $match: { _id: exist._id } },
+                memberLookup(),
+                { $unwind: "$memberData" },
+                //like
+            ])
+            result[0].postImages = await Promise.all(result[0].postImages.map(async (key: string) => await this.s3Service.getImageUrl(key)))
+            if (result[0].memberData.memberImage) {
+                result[0].memberData.memberImage = await this.s3Service.getImageUrl(result[0].memberData.memberImage)
             }
             return result[0]
         } catch (err: any) {

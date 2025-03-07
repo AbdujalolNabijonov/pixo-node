@@ -8,5 +8,6 @@ export enum Message {
     IMAGES_NOT_PROVIDED = "Images were not provided!",
     NOT_AUTHENTICATED = "Log in first!",
     ALREADY_EXIST = "That member already existed!",
-    NO_COMMENT="Empty comment denied!"
+    NO_COMMENT="Empty comment denied!",
+    NO_ID_PROVIDE="Relevant id is not provided!"
 }

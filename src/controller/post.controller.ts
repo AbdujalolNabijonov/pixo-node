@@ -36,6 +36,18 @@ postController.createPost = async (req: RequestAuth, res: Response) => {
     }
 }
 
+postController.getPost = async (req: RequestAuth, res: Response) => {
+    try {
+        console.log("GET: getPost")
+        const postId = req.params.id;
+        const post = await postService.getPost(req.member, postId);
+        res.status(HttpCode.OK).json({ value: post })
+    } catch (err: any) {
+        console.log(`Error: getPost, ${err.message}`)
+        res.status(HttpCode.BAD_REQUEST).json({ code: HttpCode.BAD_REQUEST, message: err.messsage })
+    }
+}
+
 postController.getPosts = async (req: RequestAuth, res: Response) => {
     try {
         console.log("GET: getPosts")

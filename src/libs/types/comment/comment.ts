@@ -1,4 +1,6 @@
 import { ObjectId } from "mongoose"
+import { MetaCounter } from "../common";
+import { Member } from "../member/member";
 
 export interface Comment {
     _id: ObjectId;
@@ -6,6 +8,12 @@ export interface Comment {
     commentContent: string;
     commentTargetId: ObjectId;
     commentLikes: number;
+    memberData?: Member
     createdAt: Date;
     updatedAt: Date;
+}
+
+export interface Comments {
+    list: Comment[]
+    metaCounter: MetaCounter[]
 }

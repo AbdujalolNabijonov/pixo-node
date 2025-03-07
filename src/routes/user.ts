@@ -54,6 +54,12 @@ userRouter.post(
     postController.createPost
 )
 
+userRouter.get(
+    "/post/:id",
+    isMemberAuth,
+    postController.getPost
+)
+
 userRouter.post(
     "/post/posts",
     isMemberAuth,
@@ -71,6 +77,12 @@ userRouter.post(
     "/comment/create-comment",
     memberRetrieve,
     commentController.createComment
+)
+
+userRouter.post(
+    "/comment/comments",
+    isMemberAuth,
+    commentController.getComments
 )
 
 
