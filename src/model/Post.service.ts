@@ -1,7 +1,7 @@
 import { Model } from "mongoose";
 import { Member } from "../libs/types/member/member";
 import { Post, Posts } from "../libs/types/post/post";
-import { PostInput, PostInquiry } from "../libs/types/post/post.input";
+import { PostEdit, PostInput, PostInquiry } from "../libs/types/post/post.input";
 import PostModel from "../schema/Post.schema";
 import MemberService from "./Member.service";
 import { T } from "../libs/types/common";
@@ -100,6 +100,19 @@ class PostService {
                 })
             )
             return exist
+        } catch (err: any) {
+            throw err
+        }
+    }
+
+    public async statsPostEdit(data: PostEdit): Promise<Post> {
+        try {
+            const post = await this.postModel.findOneAndUpdate(
+                { _id: data.postTargetId, postStatus: PostStatus.Active },
+                { $inc: { [data.postData]: data.modifier } },
+                { new: true }
+            )
+            return post
         } catch (err: any) {
             throw err
         }

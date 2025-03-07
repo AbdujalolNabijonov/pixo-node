@@ -21,3 +21,9 @@ interface search {
     postStatus?: PostStatus
     memberId?: ObjectId
 }
+
+export interface PostEdit {
+    modifier: number
+    postTargetId: ObjectId
+    postData:string
+}

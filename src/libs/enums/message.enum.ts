@@ -7,5 +7,6 @@ export enum Message {
     WRONG_PASSWORD = "You inserted wrong password!",
     IMAGES_NOT_PROVIDED = "Images were not provided!",
     NOT_AUTHENTICATED = "Log in first!",
-    ALREADY_EXIST = "That member already existed!"
+    ALREADY_EXIST = "That member already existed!",
+    NO_COMMENT="Empty comment denied!"
 }

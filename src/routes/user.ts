@@ -3,6 +3,7 @@ import memberController from "../controller/member.controller"
 import uploader from "../libs/utility/imageUploader"
 import postController from "../controller/post.controller";
 import { isMemberAuth, memberRetrieve } from "../libs/middleware/auth.md";
+import commentController from "../controller/comment.controller";
 
 const userRouter = Router()
 
@@ -63,6 +64,13 @@ userRouter.post(
     "/post/delete/:id",
     memberRetrieve,
     postController.deletePost
+)
+
+//Comment
+userRouter.post(
+    "/comment/create-comment",
+    memberRetrieve,
+    commentController.createComment
 )
 
 
