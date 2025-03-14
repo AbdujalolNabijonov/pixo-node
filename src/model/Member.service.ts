@@ -121,11 +121,12 @@ class MemberService {
         return members[0]
     }
 
-    public async statsMemberEdit(memberId: ObjectId, modifier: number) {
+    public async statsMemberEdit(memberId: ObjectId, modifier: number, key: string) {
         try {
             const member = await this.memberModel.findOneAndUpdate(
                 { _id: memberId, memberStatus: MemberStatus.ACTIVE },
-                { $inc: { memberPosts: modifier } }
+                { $inc: { [key]: modifier } },
+                { new: true }
             ).lean().exec()
             if (!member) throw new Errors(HttpCode.NOT_FOUND, Message.NO_USER)
             return member

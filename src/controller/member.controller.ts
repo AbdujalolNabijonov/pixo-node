@@ -10,10 +10,12 @@ import AuthService from "../model/Auth.service";
 import { BUCKET_REGION, TOKEN_DURATION } from "../libs/config";
 import S3Service from "../model/S3.service";
 import { MemberUpdate } from "../libs/types/member/member.update";
+import LikeService from "../model/Like.service";
 
 const memberController: T = {}
 const memberService = new MemberService()
 const authService = new AuthService()
+const likeService = new LikeService()
 
 memberController.signup = async (req: Request, res: Response) => {
     try {
@@ -108,6 +110,18 @@ memberController.getMembers = async (req: RequestAuth, res: Response) => {
         console.log(`Error: getMembers, ${err.message}`)
         const message = new Errors(HttpCode.BAD_REQUEST, err.message)
         res.status(HttpCode.BAD_REQUEST).json({ code: message.code, message: message.message })
+    }
+}
+
+memberController.likeTargetMember = async (req: RequestAuth, res: Response) => {
+    try {
+        console.log("POST: likeTargetMember");
+        const likeTargetId = req.params.id;
+        const member = await likeService.likeTargetMember(req.member as Member, likeTargetId);
+        res.status(HttpCode.OK).json({ value: member })
+    } catch (err: any) {
+        console.log(`Error: likeTargetMember, ${err.message}`);
+        res.status(HttpCode.BAD_REQUEST).json({ code: HttpCode.BAD_REQUEST, message: err.message })
     }
 }
 

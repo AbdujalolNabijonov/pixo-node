@@ -27,7 +27,7 @@ class PostService {
         try {
             data.memberId = member._id;
             const post = await this.postModel.create(data);
-            await this.memberService.statsMemberEdit(member._id, 1)
+            await this.memberService.statsMemberEdit(member._id, 1, "memberPosts")
             return post
         } catch (err: any) {
             throw err

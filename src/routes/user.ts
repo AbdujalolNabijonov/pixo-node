@@ -85,5 +85,12 @@ userRouter.post(
     commentController.getComments
 )
 
+//LIKE
+userRouter.post(
+    "/member/like/:id",
+    memberRetrieve,
+    memberController.likeTargetMember
+)
+
 
 export default userRouter

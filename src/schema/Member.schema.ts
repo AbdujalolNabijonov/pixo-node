@@ -37,6 +37,10 @@ const memberSchema = new Schema({
         type: Number,
         default: 0
     },
+    memberLikes: {
+        type: Number,
+        default: 0
+    },
     memberWarnings: {
         type: Number,
         default: 0
