@@ -92,5 +92,11 @@ userRouter.post(
     memberController.likeTargetMember
 )
 
+userRouter.post(
+    "/post/like/:id",
+    memberRetrieve,
+    postController.likeTargetPost
+)
+
 
 export default userRouter

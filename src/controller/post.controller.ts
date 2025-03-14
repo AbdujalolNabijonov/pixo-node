@@ -7,10 +7,12 @@ import { PostInput, PostInquiry } from "../libs/types/post/post.input";
 import PostService from "../model/Post.service";
 import S3Service from "../model/S3.service";
 import { Member } from "../libs/types/member/member";
+import LikeService from "../model/Like.service";
 
 const postController: T = {};
 const postService = new PostService()
 const s3Service = new S3Service()
+const likeService = new LikeService()
 
 postController.createPost = async (req: RequestAuth, res: Response) => {
     try {
@@ -69,6 +71,18 @@ postController.deletePost = async (req: RequestAuth, res: Response) => {
     } catch (err: any) {
         console.log(`Error: deletePost, ${err.message}`)
         res.status(HttpCode.NOT_FOUND).json({ code: HttpCode.BAD_REQUEST, message: err.message })
+    }
+}
+
+postController.likeTargetPost = async (req: RequestAuth, res: Response) => {
+    try {
+        console.log("POST: likeTargetPost")
+        const likeTargetId = req.params.id;
+        const post = await likeService.likeTargetPost(req.member as Member, likeTargetId);
+        res.status(HttpCode.OK).json({ value: post })
+    } catch (err: any) {
+        console.log(`Error: likeTargetPost, ${err.message}`)
+        res.status(HttpCode.BAD_REQUEST).json({ code: HttpCode.BAD_REQUEST, message: err.message })
     }
 }
 
