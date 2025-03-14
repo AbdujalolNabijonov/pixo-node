@@ -86,4 +86,16 @@ postController.likeTargetPost = async (req: RequestAuth, res: Response) => {
     }
 }
 
+postController.getFavorityPosts = async (req: RequestAuth, res: Response) => {
+    try {
+        console.log("GET: getFavorityPosts")
+        const data = req.body;
+        const posts = await likeService.getFavorityPosts(req.member as Member, data)
+        res.status(HttpCode.OK).json({ value: posts })
+    } catch (err: any) {
+        console.log(`Error: getFavorityPosts, ${err.message}`)
+        res.status(HttpCode.BAD_REQUEST).json({ code: HttpCode.BAD_REQUEST, message: err.message })
+    }
+}
+
 export default postController

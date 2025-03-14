@@ -25,5 +25,17 @@ interface search {
 export interface PostEdit {
     modifier: number
     postTargetId: ObjectId
-    postData:string
+    postData: string
+}
+
+export interface FavorityPostInquiry {
+    page: number;
+    limit: number;
+    order?: string;
+    direction?: Direction,
+    search: FPISearch
+}
+
+interface FPISearch {
+    memberId: string
 }

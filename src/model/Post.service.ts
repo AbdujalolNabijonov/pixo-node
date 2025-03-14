@@ -1,13 +1,13 @@
-import { Model } from "mongoose";
+import { Model, ObjectId } from "mongoose";
 import { Member } from "../libs/types/member/member";
 import { Post, Posts } from "../libs/types/post/post";
-import { PostEdit, PostInput, PostInquiry } from "../libs/types/post/post.input";
+import { FavorityPostInquiry, PostEdit, PostInput, PostInquiry } from "../libs/types/post/post.input";
 import PostModel from "../schema/Post.schema";
 import MemberService from "./Member.service";
 import { T } from "../libs/types/common";
 import { PostStatus } from "../libs/enums/post.enum";
 import { Direction } from "../libs/enums/common.enum";
-import { memberLookup, shapeintomongodbkey } from "../libs/config";
+import { likedLookup, memberLookup, shapeintomongodbkey } from "../libs/config";
 import S3Service from "./S3.service";
 import { Errors } from "../libs/Error/Error";
 import { HttpCode } from "../libs/enums/httpCode.enum";
@@ -103,6 +103,7 @@ class PostService {
             throw err
         }
     }
+
 
     public async deletePost(member: Member, postId: string): Promise<Post> {
         try {

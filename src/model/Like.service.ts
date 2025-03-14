@@ -1,24 +1,29 @@
 import { Model, ObjectId } from "mongoose";
 import { LikeInput } from "../libs/types/like/like.input";
 import LikeModel from "../schema/Like.schema";
-import { shapeintomongodbkey } from "../libs/config";
+import { likedLookup, memberLookup, shapeintomongodbkey } from "../libs/config";
 import MemberService from "./Member.service";
 import { LikeGroup } from "../libs/enums/like.enum";
 import { Member } from "../libs/types/member/member";
 import PostService from "./Post.service";
-import { PostEdit } from "../libs/types/post/post.input";
+import { FavorityPostInquiry, PostEdit } from "../libs/types/post/post.input";
 import { Errors } from "../libs/Error/Error";
 import { HttpCode } from "../libs/enums/httpCode.enum";
 import { Message } from "../libs/enums/message.enum";
+import { T } from "../libs/types/common";
+import { Posts } from "../libs/types/post/post";
+import S3Service from "./S3.service";
 
 class LikeService {
     likeModel: Model<any>
     memberService
     postService
+    s3Service
     constructor() {
         this.likeModel = LikeModel
         this.memberService = new MemberService()
         this.postService = new PostService()
+        this.s3Service = new S3Service()
     }
     public async likeTargetMember(member: Member, targetId: string): Promise<Member> {
         try {
@@ -47,7 +52,7 @@ class LikeService {
             const exist = await this.existedLike(memberId as ObjectId, targetId as ObjectId);
             let result = null
             if (exist) {
-                await this.likeModel.findOneAndDelete({ memberId, likeTargetId, likeGroup: LikeGroup.MEMBER });
+                await this.likeModel.findOneAndDelete({ memberId, likeTargetId, likeGroup: LikeGroup.POST });
                 const postData: PostEdit = {
                     postTargetId: targetId as ObjectId,
                     postData: "postLikes",
@@ -55,7 +60,7 @@ class LikeService {
                 }
                 result = await this.postService.statsPostEdit(postData)
             } else {
-                await this.likeModel.create({ memberId, likeTargetId, likeGroup: LikeGroup.MEMBER });
+                await this.likeModel.create({ memberId, likeTargetId, likeGroup: LikeGroup.POST });
                 const postData: PostEdit = {
                     postTargetId: targetId as ObjectId,
                     postData: "postLikes",
@@ -65,6 +70,63 @@ class LikeService {
             }
             if (!result) throw new Errors(HttpCode.BAD_REQUEST, Message.NO_DATA)
             return result
+        } catch (err: any) {
+            throw err
+        }
+    }
+
+    public async getFavorityPosts(member: Member, data: FavorityPostInquiry): Promise<Posts> {
+        try {
+            const { page, limit, order, direction, search } = data
+            const { memberId } = search
+            const memberAuthId = shapeintomongodbkey(member._id)
+
+            const match: T = {
+                memberId: memberAuthId,
+                likeGroup: LikeGroup.POST
+            }
+            const result = await this.likeModel.aggregate([
+                { $match: match },
+                {
+                    $lookup: {
+                        from: "posts",
+                        localField: "likeTargetId",
+                        foreignField: "_id",
+                        as: "postData"
+                    }
+                },
+                { $unwind: "$postData" },
+                {
+                    $facet: {
+                        list: [
+                            { $skip: (page - 1) * limit },
+                            { $limit: limit },
+                            {
+                                $lookup: {
+                                    from: "members",
+                                    localField: "postData.memberId",
+                                    foreignField: "_id",
+                                    as: "postData.memberData"
+                                }
+                            },
+                            { $unwind: "$postData.memberData" },
+                        ],
+                        metaCounter: [{ $count: "total" }]
+                    }
+                }
+            ]).exec()
+            if (result[0]) {
+                result[0].list = await Promise.all(result[0].list.map(async (data: any) => {
+                    data.postData.postImages = await Promise.all(
+                        data.postData.postImages.map(async (key: string) => await this.s3Service.getImageUrl(key))
+                    )
+                    if (data.postData.memberData.memberImage) {
+                        data.postData.memberData.memberImage = await this.s3Service.getImageUrl(data.postData.memberData.memberImage)
+                    }
+                    return data
+                }))
+            }
+            return result[0]
         } catch (err: any) {
             throw err
         }

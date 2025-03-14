@@ -98,5 +98,11 @@ userRouter.post(
     postController.likeTargetPost
 )
 
+userRouter.post(
+    "/post/favorite-posts",
+    isMemberAuth,
+    postController.getFavorityPosts
+)
+
 
 export default userRouter
