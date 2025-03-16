@@ -8,7 +8,7 @@ import { HttpCode } from "../libs/enums/httpCode.enum"
 import { Message } from "../libs/enums/message.enum"
 import { MemberStatus, MemberType } from "../libs/enums/member.enum"
 import { T } from "../libs/types/common"
-import { shapeintomongodbkey } from "../libs/config"
+import { likedLookup, shapeintomongodbkey } from "../libs/config"
 import S3Service from "./S3.service"
 import { MemberUpdate } from "../libs/types/member/member.update"
 
@@ -59,10 +59,11 @@ class MemberService {
     public async getMember(member: Member | null, memberId: string): Promise<Member> {
         try {
             const match: T = { _id: shapeintomongodbkey(memberId), memberStatus: MemberStatus.ACTIVE }
+            const memberAuthId = shapeintomongodbkey(member?._id as ObjectId)
             const exist = await this.memberModel.aggregate([
                 { $match: match },
-                { $project: { memberPassword: 0 } }
-                //like
+                { $project: { memberPassword: 0 } },
+                likedLookup(memberAuthId as ObjectId)
             ]).exec();
             if (!exist) throw new Errors(HttpCode.NOT_FOUND, Message.NO_USER);
             if (exist[0].memberImage) {

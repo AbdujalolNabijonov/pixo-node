@@ -77,8 +77,7 @@ class LikeService {
 
     public async getFavorityPosts(member: Member, data: FavorityPostInquiry): Promise<Posts> {
         try {
-            const { page, limit, order, direction, search } = data
-            const { memberId } = search
+            const { page, limit, order, direction } = data
             const memberAuthId = shapeintomongodbkey(member._id)
 
             const match: T = {
@@ -120,10 +119,11 @@ class LikeService {
                     data.postData.postImages = await Promise.all(
                         data.postData.postImages.map(async (key: string) => await this.s3Service.getImageUrl(key))
                     )
+                    data.postData.meLiked = [{meLiked:true}]
                     if (data.postData.memberData.memberImage) {
                         data.postData.memberData.memberImage = await this.s3Service.getImageUrl(data.postData.memberData.memberImage)
                     }
-                    return data
+                    return data.postData
                 }))
             }
             return result[0]
