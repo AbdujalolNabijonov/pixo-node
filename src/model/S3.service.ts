@@ -3,7 +3,6 @@ import { BUCKET_NAME, BUCKET_REGION, S3_ACCESS_KEY, S3_SECRET_KEY, URL_DURATION 
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { v4 } from "uuid"
 import path from 'path'
-import sharp from "sharp"
 
 const s3 = new S3Client({
     region: BUCKET_REGION,

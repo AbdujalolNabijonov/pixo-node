@@ -11,6 +11,7 @@ import { Member } from "./libs/types/member/member";
 import AuthService from "./model/Auth.service";
 import { JwtPayload } from "jsonwebtoken";
 import { InfoMessage, NewMessage } from "./libs/types/socket/message";
+import S3Service from "./model/S3.service";
 
 const app = express();
 app.use(express.urlencoded({ extended: true }))
@@ -39,46 +40,51 @@ io.on("connection", async (server: Socket) => {
         console.log("--- SOCKET CONNECTION ---")
         totalClients++
 
-        const token = server.request.headers.token;
+        server.emit("message", JSON.stringify(messageList))
+        const token = server.handshake.auth.token;
         if (token) {
-            const authService = new AuthService
+            const authService = new AuthService()
+            const s3Service = new S3Service()
             const member = await authService.retrieveToken(token as string) as Member
+            if (member.memberImage) {
+                member.memberImage = await s3Service.getImageUrl(member.memberImage)
+            }
             clients.set(server, member)
             console.log(`--- SOCKET AUTH [${member.memberNick}] ----`)
         } else {
             clients.set(server, null)
-            console.log(`--- SOCKET AUTH [GUEST}] ----`)
+            console.log(`--- SOCKET AUTH [GUEST] ----`)
         }
 
         const infoMessage: InfoMessage = {
             event: "info",
             memberData: clients.get(server) as Member | null,
             totalClients: totalClients,
-            action: "joined"
+            action: "joined",
+            date: new Date()
         }
-        clients.forEach((member, client) => {
-            if (client != server) {
-                client.emit("infoMessage", JSON.stringify(infoMessage))
-            }
-        })
+        io.emit("infoMessage", JSON.stringify(infoMessage))
 
         server.on("message", (data) => {
             const msg = JSON.parse(data).text;
             const newMessage: NewMessage = {
                 event: "message",
                 memberData: clients.get(server) as Member | null,
-                message: msg
+                message: msg,
+                date: new Date()
             }
             messageList.push(newMessage);
             io.emit("message", JSON.stringify(messageList))
         })
 
         server.on("disconnect", () => {
+            totalClients--
             const infoMessage: InfoMessage = {
                 event: "info",
                 memberData: clients.get(server) as Member | null,
                 totalClients: totalClients,
-                action: "left"
+                action: "left",
+                date: new Date()
             }
             clients.forEach((member, client) => {
                 if (client != server) {
