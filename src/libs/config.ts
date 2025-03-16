@@ -31,7 +31,7 @@ export const memberLookup = () => ({
     }
 })
 
-export const likedLookup = (memberAuthId:ObjectId) => {
+export const likedLookup = (memberAuthId: ObjectId) => {
     return (
         {
             $lookup: {
@@ -58,6 +58,42 @@ export const likedLookup = (memberAuthId:ObjectId) => {
                         $project: {
                             memberId: "$$memberId",
                             likeTargetId: "$_id",
+                            meLiked: "$$meLiked"
+                        }
+                    }
+                ],
+                as: "meLiked"
+            }
+        }
+    )
+}
+
+export const lookupLikedPost = (memberAuthId: ObjectId) => {
+    return (
+        {
+            $lookup: {
+                from: "likes",
+                let: {
+                    memberId: memberAuthId,
+                    likeTargetId: "$_id",
+                    meLiked: true,
+                },
+                pipeline: [
+                    {
+                        $match: {
+                            $expr: {
+                                $and: [
+                                    { $eq: ["$memberId", "$$memberId"] },
+                                    { $eq: ["$likeTargetId", "$$likeTargetId"] }
+                                ]
+                            }
+                        }
+                    },
+                    {
+                        $project: {
+                            _id: 0,
+                            likeTargetId: 1,
+                            memberId: 1,
                             meLiked: "$$meLiked"
                         }
                     }

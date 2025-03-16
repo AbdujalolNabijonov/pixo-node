@@ -7,7 +7,7 @@ import MemberService from "./Member.service";
 import { T } from "../libs/types/common";
 import { PostStatus } from "../libs/enums/post.enum";
 import { Direction } from "../libs/enums/common.enum";
-import { likedLookup, memberLookup, shapeintomongodbkey } from "../libs/config";
+import { likedLookup, lookupLikedPost, memberLookup, shapeintomongodbkey } from "../libs/config";
 import S3Service from "./S3.service";
 import { Errors } from "../libs/Error/Error";
 import { HttpCode } from "../libs/enums/httpCode.enum";
@@ -43,6 +43,7 @@ class PostService {
             if (text) match.postTitle = { $regex: new RegExp(text, "i") }
             if (memberId) { match.memberId = shapeintomongodbkey(memberId) }
             const sort: T = { [order ?? "createdAt"]: direction ?? Direction.DEC }
+            const memberAuthId = shapeintomongodbkey(member?._id as ObjectId)
             const result = await this.postModel.aggregate([
                 { $match: match },
                 { $sort: sort },
@@ -59,8 +60,8 @@ class PostService {
                                     as: "memberData"
                                 }
                             },
-                            { $unwind: '$memberData' }
-                            //like
+                            { $unwind: '$memberData' },
+                            lookupLikedPost(memberAuthId as ObjectId)
                         ],
                         metaCounter: [{ $count: "total" }]
                     }
@@ -88,11 +89,12 @@ class PostService {
         try {
             const exist = await this.postModel.findOne({ _id: shapeintomongodbkey(postId), postStatus: PostStatus.Active }).exec()
             if (!exist) throw new Errors(HttpCode.NOT_FOUND, Message.NO_POST);
+            const memberAuthId = shapeintomongodbkey(member?._id as ObjectId)
             const result = await this.postModel.aggregate([
                 { $match: { _id: exist._id } },
                 memberLookup(),
                 { $unwind: "$memberData" },
-                //like
+                lookupLikedPost(memberAuthId as ObjectId)
             ])
             result[0].postImages = await Promise.all(result[0].postImages.map(async (key: string) => await this.s3Service.getImageUrl(key)))
             if (result[0].memberData.memberImage) {
@@ -133,6 +135,7 @@ class PostService {
                 { $inc: { [data.postData]: data.modifier } },
                 { new: true }
             )
+            if (!post) throw new Errors(HttpCode.NOT_FOUND, Message.NO_POST)
             return post
         } catch (err: any) {
             throw err
