@@ -28,7 +28,6 @@ memberController.signup = async (req: Request, res: Response) => {
         res.cookie("accessToken", token, {
             maxAge: 60 * 60 * 1000 * TOKEN_DURATION,
             httpOnly: false,
-            secure: process.env.NODE_ENV === "production"
         })
         res.status(HttpCode.CREATED).json({ value: member })
     } catch (err: any) {
@@ -43,7 +42,6 @@ memberController.logout = (req: Request, res: Response) => {
         res.cookie("accessToken", null, {
             maxAge: 0,
             httpOnly: false,
-            secure: process.env.NODE_ENV === "production"
         })
         res.status(HttpCode.CREATED).json({ value: "done" })
     } catch (err: any) {
