@@ -1,0 +1,20 @@
+services:
+  pixo-node:
+    container_name: pixo-node
+    restart: always
+    image: node:22.12.0
+    ports:
+      - 3020:3020
+    volumes:
+      - ./:/usr/src/pixo
+    working_dir: /usr/src/pixo
+
+    networks:
+      - app-network
+    
+    command: bash -c "npm install && npm run build && npm run start:prod"
+
+networks:
+  app-network:
+    driver: bridge
+    
