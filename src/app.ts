@@ -11,7 +11,6 @@ import { Member } from "./libs/types/member/member";
 import AuthService from "./model/Auth.service";
 import { JwtPayload } from "jsonwebtoken";
 import { InfoMessage, NewMessage } from "./libs/types/socket/message";
-import S3Service from "./model/S3.service";
 
 const app = express();
 app.use(express.urlencoded({ extended: true }))
@@ -44,11 +43,7 @@ io.on("connection", async (server: Socket) => {
         const token = server.handshake.auth.token;
         if (token) {
             const authService = new AuthService()
-            const s3Service = new S3Service()
             const member = await authService.retrieveToken(token as string) as Member
-            if (member.memberImage) {
-                member.memberImage = await s3Service.getImageUrl(member.memberImage)
-            }
             clients.set(server, member)
             console.log(`--- SOCKET AUTH [${member.memberNick}] ----`)
         } else {
