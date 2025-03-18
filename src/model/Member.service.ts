@@ -89,6 +89,9 @@ class MemberService {
                 )
                 .lean()
                 .exec()
+            if (updatedMember.memberImage) {
+                updatedMember.memberImage = await this.s3Service.getImageUrl(updatedMember.memberImage)
+            }
             return updatedMember
         } catch (err: any) {
             throw err
