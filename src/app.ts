@@ -15,10 +15,14 @@ const app = express();
 app.use(express.urlencoded({ extended: true }))
 app.use(express.json())
 app.use(morgan(MORGAN))
-app.use(CookieParser())
+
 app.use(
-    cors({ origin: "http://147.93.27.216:3021", credentials: true })
-)
+    cors({
+        credentials: true,
+        origin: true,
+    })
+);
+app.use(CookieParser())
 
 
 app.use("/admin", adminRouter)
