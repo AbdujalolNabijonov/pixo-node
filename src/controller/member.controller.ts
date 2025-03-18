@@ -25,9 +25,6 @@ memberController.signup = async (req: Request, res: Response) => {
         const member: Member = await memberService.signup(file, data)
         //@ts-ignore
         const token = await authService.createToken(member.toObject())
-        if (token) {
-            console.log("token created")
-        }
         res.cookie("accessToken", token, {
             maxAge: 60 * 60 * 1000 * TOKEN_DURATION,
             httpOnly: false,
@@ -61,7 +58,6 @@ memberController.login = async (req: Request, res: Response) => {
         res.cookie("accessToken", token, {
             maxAge: 60 * 60 * 1000 * TOKEN_DURATION,
             httpOnly: false,
-            secure: process.env.NODE_ENV === "production"
         })
         res.status(HttpCode.OK).json({ value: member })
     } catch (err: any) {
