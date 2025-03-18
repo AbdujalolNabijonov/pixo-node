@@ -1,4 +1,4 @@
-import express, { Request, Response } from "express";
+import express from "express";
 import morgan from "morgan"
 import { MORGAN } from "./libs/config";
 import adminRouter from "./routes/admin";
@@ -9,7 +9,6 @@ import { Socket, Server } from "socket.io"
 import http from "http"
 import { Member } from "./libs/types/member/member";
 import AuthService from "./model/Auth.service";
-import { JwtPayload } from "jsonwebtoken";
 import { InfoMessage, NewMessage } from "./libs/types/socket/message";
 
 const app = express();
@@ -18,7 +17,7 @@ app.use(express.json())
 app.use(morgan(MORGAN))
 app.use(CookieParser())
 app.use(
-    cors({ origin: true, credentials: true })
+    cors({ origin: "http://147.93.27.216:3021", credentials: true })
 )
 
 
