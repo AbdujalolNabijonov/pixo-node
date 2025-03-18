@@ -13,6 +13,7 @@ import { Message } from "../libs/enums/message.enum";
 import { T } from "../libs/types/common";
 import { Posts } from "../libs/types/post/post";
 import S3Service from "./S3.service";
+import { PostStatus } from "../libs/enums/post.enum";
 
 class LikeService {
     likeModel: Model<any>
@@ -89,8 +90,19 @@ class LikeService {
                 {
                     $lookup: {
                         from: "posts",
-                        localField: "likeTargetId",
-                        foreignField: "_id",
+                        let: {
+                            likeTargetId: "$likeTargetId"
+                        },
+                        pipeline: [{
+                            $match: {
+                                $expr: {
+                                    $and: [
+                                        {$eq:["$_id","$$likeTargetId"]},
+                                        {$eq:["$postStatus","ACTIVE"]}
+                                    ]
+                                }
+                            }
+                        }],
                         as: "postData"
                     }
                 },
@@ -119,13 +131,14 @@ class LikeService {
                     data.postData.postImages = await Promise.all(
                         data.postData.postImages.map(async (key: string) => await this.s3Service.getImageUrl(key))
                     )
-                    data.postData.meLiked = [{meLiked:true}]
+                    data.postData.meLiked = [{ meLiked: true }]
                     if (data.postData.memberData.memberImage) {
                         data.postData.memberData.memberImage = await this.s3Service.getImageUrl(data.postData.memberData.memberImage)
                     }
                     return data.postData
                 }))
             }
+            console.log(result[0])
             return result[0]
         } catch (err: any) {
             throw err

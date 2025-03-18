@@ -109,7 +109,7 @@ class PostService {
 
     public async deletePost(member: Member, postId: string): Promise<Post> {
         try {
-            const exist = await this.postModel.findOneAndDelete(
+            const exist = await this.postModel.findOne(
                 {
                     _id: shapeintomongodbkey(postId),
                     postStatus: PostStatus.Active,
@@ -117,12 +117,18 @@ class PostService {
                 }
             ).exec();
             if (!exist) throw new Errors(HttpCode.NOT_FOUND, Message.NO_POST)
+            const result = await this.postModel
+                .findByIdAndUpdate(
+                    exist._id,
+                    { postStatus: PostStatus.DELETE },
+                    { new: true }
+                )
             await Promise.all(
-                exist.postImages.map(async (key: string) => {
+                result.postImages.map(async (key: string) => {
                     await this.s3Service.deleteImage(key)
                 })
             )
-            return exist
+            return result
         } catch (err: any) {
             throw err
         }
